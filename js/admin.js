@@ -64,24 +64,26 @@ function getOderList() {
       orderList.innerHTML = str;
     });
 }
-// 訂單處理
+// 訂單狀態/操作刪除按鈕監聽處理
 orderList.addEventListener("click", (e) => {
   e.preventDefault();
   const targetClass = e.target.getAttribute("class");
   //console.log(targetClass);
+  let id = e.target.getAttribute("data-id");
   if (targetClass == "delSingleOrder-Btn js-orderDelete") {
-    alert("你點到刪除按鈕");
+    //alert("你點到刪除按鈕");
+    deleteOrder(id);
     return;
   }
   if (targetClass == "js-orderStatus") {
     let status = e.target.getAttribute("data-status");
-    let id = e.target.getAttribute("data-id");
-    deleteOrderItem(status, id);
+
+    changeOrderStatus(status, id);
     return;
   }
 });
-// 刪除訂單
-function deleteOrderItem(status, id) {
+//變更訂單狀態函示
+function changeOrderStatus(status, id) {
   //console.log(status, id);
   let newStatus;
   if (status == true) {
@@ -106,6 +108,23 @@ function deleteOrderItem(status, id) {
     )
     .then((res) => {
       alert("變更成功");
+      getOderList();
+    });
+}
+// 刪除訂單
+function deleteOrder(id) {
+  //console.log(id);
+  axios
+    .delete(
+      `https://livejs-api.hexschool.io/api/livejs/v1/admin/${api_path}/orders/${id}`,
+      {
+        headers: {
+          authorization: token,
+        },
+      }
+    )
+    .then((res) => {
+      alert("has deleted this order");
       getOderList();
     });
 }

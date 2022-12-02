@@ -7,6 +7,7 @@ const productList = document.querySelector(".productWrap");
 //0.初始化
 function init() {
   getProductList();
+  getCartList();
 }
 init();
 
@@ -38,7 +39,8 @@ function renderProductList(renderData) {
         src="${item.images}"
         alt=""
       />
-      <a href="#" data-id="${item.id}" class="addCardBtn js-addCart">加入購物車</a>
+      <a href="#" id="addCardBtn" class="js-addCart" data-id="${item.id}" >加入購物車</a>
+     
       <h3>${item.title}</h3>
       <del class="originPrice">NT$${item.origin_price}</del>
       <p class="nowPrice">NT$${item.price}</p>
@@ -103,7 +105,44 @@ const searchResultText = document.querySelector("#searchResult-text");
 //   })
 //   productList.innerHTML = str;
 // })
+
+console.log("from here");
+let cartData = [];
 //５.購物車列表
+const cartList = document.querySelector(".shoppingCart-tabList");
+function getCartList() {
+  axios
+    .get(
+      `https://livejs-api.hexschool.io/api/livejs/v1/customer/${api_path}/carts`
+    )
+    .then(function (response) {
+      cartData = response.data.carts;
+      //console.log(cartData);
+      let str = "";
+      cartData.forEach((item) => {
+        str += `<tr>
+        <td>
+          <div class="cardItem-title">
+            <img src="${item.product.images}" alt="" />
+            <p>${item.product.title}</p>
+          </div>
+        </td>
+        <td>$${item.product.price}</td>
+        <td>${item.quantity}</td>
+        <td>NT$${item.product.price * item.quantity}</td>
+        <td class="discardBtn">
+          <a href="#" class="material-icons"> clear </a>
+        </td>
+      </tr>`;
+      });
+
+      cartList.innerHTML = str;
+    })
+    .catch(function (error) {
+      // handle error
+      console.log(error);
+    });
+}
 
 //６.加入購物車
 productList.addEventListener("click", (e) => {
@@ -117,6 +156,37 @@ productList.addEventListener("click", (e) => {
     return;
   }
   let productId = e.target.getAttribute("data-id");
-  console.log(productId);
+  //確認條件屬性最好只有一個 我使用class但裡面放兩個不一樣的class名稱就顯示不了
+  //console.log(productId);
+  //點到商品時要先確認購物車已是否有此產品 如果有就+1 沒有就=0
+  let numCheck = 1;
+  // 產品數量預設數量是１
+  //點到產品列表的商品時取到商品id去跟購物車做比對
+  cartData.forEach((item) => {
+    //如果產品列表的產品id跟購物車的一樣
+    if (item.product.id === productId) {
+      numCheck = item.quantity += 1;
+    }
+  });
+  //console.log(numCheck);
+  axios
+    .post(
+      `https://livejs-api.hexschool.io/api/livejs/v1/customer/${api_path}/carts`,
+      {
+        data: {
+          productId: productId,
+          quantity: numCheck,
+        },
+      }
+    )
+    .then(function (response) {
+      console.log();
+      alert("已加入購物車清單");
+      getCartList();
+    })
+    .catch(function (error) {
+      // handle error
+      console.log(error);
+    });
 });
 //7.刪除購物車

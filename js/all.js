@@ -242,21 +242,45 @@ orderInfoBtn.addEventListener("click", (e) => {
   const customerEmail = document.querySelector("#customerEmail").value;
   const customerAddress = document.querySelector("#customerAddress").value;
   const tradeWay = document.querySelector("#tradeWay").value;
+  // console.log(
+  //   customerName,
+  //   customerPhone,
+  //   customerEmail,
+  //   customerAddress,
+  //   tradeWay
+  // );
   if (
     customerName == "" ||
-    customerPhone.value == "" ||
-    customerEmail.value == "" ||
-    customerAddress.value == "" ||
-    tradeWay.value == ""
+    customerPhone == "" ||
+    customerEmail == "" ||
+    customerAddress == "" ||
+    tradeWay == ""
   ) {
     alert("complete information");
     return;
   }
+  axios
+    .post(
+      `https://livejs-api.hexschool.io/api/livejs/v1/customer/${api_path}/orders`,
+      {
+        data: {
+          user: {
+            name: customerName,
+            tel: customerPhone,
+            email: customerEmail,
+            address: customerAddress,
+            payment: tradeWay,
+          },
+        },
+      }
+    )
+    .then((response) => {
+      alert("order has been sent!!");
+      document.querySelector("#customerName").value = "";
+      document.querySelector("#customerPhone").value = "";
+      document.querySelector("#customerEmail").value = "";
+      document.querySelector("#customerAddress").value = "";
+      document.querySelector("#tradeWay").value = "ATM";
+      getCartList();
+    });
 });
-// console.log(
-//   customerName,
-//   customerPhone.value,
-//   customerEmail.value,
-//   customerAddress.value,
-//   tradeWay.value
-// );

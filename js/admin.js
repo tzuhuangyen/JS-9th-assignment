@@ -20,6 +20,13 @@ function getOderList() {
 
       let str = "";
       orderData.forEach((item) => {
+        // 組時間字串
+        const timeStamp = new Date(item.createdAt * 1000);
+        const orderTime = `
+             ${timeStamp.getFullYear()}/
+             ${timeStamp.getMonth() + 1}/${timeStamp.getDate()}`;
+        console.log(orderTime);
+
         //   組同筆訂單多樣產品字串
         let productStr = "";
         item.products.forEach((productItem) => {
@@ -44,7 +51,7 @@ function getOderList() {
         <td>
           <p>${productStr}</p>
         </td>
-        <td>${item.createdAt}</td>
+        <td>${orderTime}</td>
         <td class="orderStatus">
           <a href="#" 
           class="js-orderStatus" 
@@ -62,6 +69,7 @@ function getOderList() {
       </tr>`;
       });
       orderList.innerHTML = str;
+      renderC3();
     });
 }
 // 訂單狀態/操作刪除按鈕監聽處理
@@ -82,7 +90,7 @@ orderList.addEventListener("click", (e) => {
     return;
   }
 });
-//變更訂單狀態函示
+// 變更訂單狀態函示
 function changeOrderStatus(status, id) {
   //console.log(status, id);
   let newStatus;
@@ -127,4 +135,62 @@ function deleteOrder(id) {
       alert("has deleted this order");
       getOderList();
     });
+}
+//刪除全部訂單
+const discardAllBtn = document.querySelector(".discardAllBtn");
+discardAllBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  axios
+    .delete(
+      `https://livejs-api.hexschool.io/api/livejs/v1/admin/${api_path}/orders`,
+      {
+        headers: {
+          authorization: token,
+        },
+      }
+    )
+    .then((res) => {
+      alert("has deleted ALL orders");
+      getOderList();
+    });
+});
+
+//c3圖表
+function renderC3() {
+  console.log(orderData);
+  let total = {};
+  orderData.forEach((item) => {
+    item.products.forEach((productItem) => {
+      if (total[productItem.category] === undefined) {
+        total[productItem.category] = productItem.price * productItem.quantity;
+      } else {
+        total[productItem.category] += productItem.price * productItem.quantity;
+      }
+    });
+  });
+  console.log(total);
+  //資料關聯
+  let categoryAry = Object.keys(total);
+  console.log(categoryAry);
+  let newData = [];
+  categoryAry.forEach((item) => {
+    let ary = [];
+    ary.push(item);
+    ary.push(total[item]);
+    newData.push(ary);
+  });
+  console.log(newData);
+  let chart = c3.generate({
+    bindto: "#chart", // HTML 元素綁定
+    data: {
+      type: "pie",
+      columns: newData,
+      //   colors: {
+      //     "Louvre 雙人床架": "#DACBFF",
+      //     "Antony 雙人床架": "#9D7FEA",
+      //     "Anty 雙人床架": "#5434A7",
+      //     其他: "#301E5F",
+      //   },
+    },
+  });
 }

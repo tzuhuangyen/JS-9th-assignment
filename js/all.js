@@ -242,11 +242,21 @@ orderInfoBtn.addEventListener("click", (e) => {
   const customerEmail = document.querySelector("#customerEmail").value;
   const customerAddress = document.querySelector("#customerAddress").value;
   const tradeWay = document.querySelector("#tradeWay").value;
+  if (
+    customerName == "" ||
+    customerPhone.value == "" ||
+    customerEmail.value == "" ||
+    customerAddress.value == "" ||
+    tradeWay.value == ""
+  ) {
+    alert("complete information");
+    return;
+  }
 });
-console.log(
-  customerName,
-  customerPhone.value,
-  customerEmail.value,
-  customerAddress.value,
-  tradeWay.value
-);
+// console.log(
+//   customerName,
+//   customerPhone.value,
+//   customerEmail.value,
+//   customerAddress.value,
+//   tradeWay.value
+// );

@@ -145,7 +145,6 @@ function getCartList() {
       console.log(error);
     });
 }
-
 //６.加入購物車
 productList.addEventListener("click", (e) => {
   e.preventDefault();
@@ -226,3 +225,28 @@ discardAllBtn.addEventListener("click", (e) => {
       alert("購物車已清空！快再去買起來");
     });
 });
+
+//8.送出訂單
+const orderInfoBtn = document.querySelector(".orderInfo-btn");
+orderInfoBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  //console.log("clicked");
+  //確認購物車有無商品＆＆表單訊息完整才能送出訂單
+  if (cartData.length === 0) {
+    alert("購物車沒有商品 快去買起乃");
+    return;
+  }
+  //DOM訂單
+  const customerName = document.querySelector("#customerName").value;
+  const customerPhone = document.querySelector("#customerPhone").value;
+  const customerEmail = document.querySelector("#customerEmail").value;
+  const customerAddress = document.querySelector("#customerAddress").value;
+  const tradeWay = document.querySelector("#tradeWay").value;
+});
+console.log(
+  customerName,
+  customerPhone.value,
+  customerEmail.value,
+  customerAddress.value,
+  tradeWay.value
+);

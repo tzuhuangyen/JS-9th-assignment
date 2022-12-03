@@ -39,11 +39,13 @@ function renderProductList(renderData) {
         src="${item.images}"
         alt=""
       />
-      <a href="#" id="addCardBtn" class="js-addCart" data-id="${item.id}" >加入購物車</a>
+      <a href="#" id="addCardBtn" class="js-addCart" data-id="${
+        item.id
+      }" >加入購物車</a>
      
       <h3>${item.title}</h3>
-      <del class="originPrice">NT$${item.origin_price}</del>
-      <p class="nowPrice">NT$${item.price}</p>
+      <del class="originPrice">NT$${toThousands(item.origin_price)}</del>
+      <p class="nowPrice">NT$${toThousands(item.price)}</p>
       </li>
       `;
   });
@@ -116,8 +118,9 @@ function getCartList() {
       `https://livejs-api.hexschool.io/api/livejs/v1/customer/${api_path}/carts`
     )
     .then(function (response) {
-      document.querySelector(".js-total").textContent =
-        response.data.finalTotal;
+      document.querySelector(".js-total").textContent = toThousands(
+        response.data.finalTotal
+      );
       cartData = response.data.carts;
       //console.log(cartData);
       let str = "";
@@ -129,9 +132,9 @@ function getCartList() {
             <p>${item.product.title}</p>
           </div>
         </td>
-        <td>$${item.product.price}</td>
+        <td>$${toThousands(item.product.price)}</td>
         <td>${item.quantity}</td>
-        <td>NT$${item.product.price * item.quantity}</td>
+        <td>NT$${toThousands(item.product.price * item.quantity)}</td>
         <td class="discardBtn">
           <a href="#" class="material-icons" data-id="${item.id}"> clear </a>
         </td>
@@ -284,3 +287,27 @@ orderInfoBtn.addEventListener("click", (e) => {
       getCartList();
     });
 });
+
+// util js、元件
+function toThousands(x) {
+  let parts = x.toString().split(".");
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return parts.join(".");
+}
+
+function validateEmail(mail) {
+  if (
+    /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(
+      mail
+    )
+  ) {
+    return true;
+  }
+  return false;
+}
+function validatePhone(phone) {
+  if (/^[09]{2}\d{8}$/.test(phone)) {
+    return true;
+  }
+  return false;
+}

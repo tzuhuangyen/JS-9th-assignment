@@ -17,7 +17,6 @@ function getOderList() {
     )
     .then((res) => {
       orderData = res.data.orders;
-
       let str = "";
       orderData.forEach((item) => {
         // 組時間字串
@@ -69,7 +68,8 @@ function getOderList() {
       </tr>`;
       });
       orderList.innerHTML = str;
-      renderC3();
+      //renderC3();
+      renderC3_lv2();
     });
 }
 // 訂單狀態/操作刪除按鈕監聽處理
@@ -155,9 +155,9 @@ discardAllBtn.addEventListener("click", (e) => {
     });
 });
 
-//c3圖表
+//c3圖表 lv1 &lv2
 function renderC3() {
-  console.log(orderData);
+  //   console.log(orderData);
   let total = {};
   orderData.forEach((item) => {
     item.products.forEach((productItem) => {
@@ -168,10 +168,10 @@ function renderC3() {
       }
     });
   });
-  console.log(total);
+  //console.log(total);
   //資料關聯
   let categoryAry = Object.keys(total);
-  console.log(categoryAry);
+  //console.log(categoryAry);
   let newData = [];
   categoryAry.forEach((item) => {
     let ary = [];
@@ -179,7 +179,7 @@ function renderC3() {
     ary.push(total[item]);
     newData.push(ary);
   });
-  console.log(newData);
+  //console.log(newData);
   let chart = c3.generate({
     bindto: "#chart", // HTML 元素綁定
     data: {
@@ -191,6 +191,76 @@ function renderC3() {
       //     "Anty 雙人床架": "#5434A7",
       //     其他: "#301E5F",
       //   },
+    },
+  });
+}
+//c3-level2
+//資料關聯
+//設計前三名與其他分類排名
+function renderC3_lv2() {
+  //1.將title資料計算分類{}
+  let obj = {};
+  //console.log(orderData);
+  //array(3)[{...},{...},{...}]
+  //當單筆訂單內有多項產品時 比須先加總
+  orderData.forEach((item) => {
+    item.products.forEach((productItem) => {
+      if (obj[productItem.title] === undefined) {
+        obj[productItem.title] = productItem.quantity * productItem.price;
+      } else {
+        obj[productItem.title] += productItem.quantity * productItem.price;
+      }
+    });
+  });
+  console.log(obj);
+  //{"title":price|}
+  //{
+  //   "Antony 雙人床架／雙人加大": 12000,
+  //   "Jordan 雙人床架／雙人加大": 9000
+  // }
+  //2.將obj變成自己的格式["title","title",...]
+  let originAry = Object.keys(obj);
+  console.log(originAry);
+  let rankSortAry = [];
+  originAry.forEach((item) => {
+    let ary = [];
+    ary.push(item);
+    ary.push(obj[item]);
+    rankSortAry.push(ary);
+  });
+  console.log(rankSortAry);
+  //[[title,price],[title,price],[..]]
+  //比大小排序目的：營收前三名品項當主要色塊 其餘品項加起來當一個色塊
+  rankSortAry.sort((a, b) => {
+    return b[1] - a[1];
+    //a b只是每個陣列 但要比較陣列內的陣列price所以是[1]
+  });
+  console.log(rankSortAry);
+  //如果超過四筆以上 就統整為其他
+  if (rankSortAry.length > 3) {
+    let otherTotal = 0;
+    rankSortAry.forEach((item, index) => {
+      //前三筆不動作從第四筆開始執行函示
+      if (index > 2) {
+        otherTotal += rankSortAry[index][1];
+        //第四筆開始加總每筆[index]的價錢[1]
+        //otherTotal是其他排名價錢的總額
+      }
+    });
+    rankSortAry.splice(3, rankSortAry.length - 1);
+    //移除第三筆資料後index3的資料 用otherTotal 代替跑c3圖表
+    rankSortAry.push("other", otherTotal);
+  }
+
+  //c3 chart
+  let chart = c3.generate({
+    bindto: "#chart", // HTML 元素綁定
+    data: {
+      type: "pie",
+      columns: rankSortAry,
+    },
+    colors: {
+      pattern: ["#DACBFF", "#9D7FEA", "#5434A7", "#301E5F"],
     },
   });
 }

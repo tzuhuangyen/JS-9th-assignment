@@ -68,7 +68,7 @@ function getOderList() {
       </tr>`;
       });
       orderList.innerHTML = str;
-      //renderC3();
+      renderC3();
       renderC3_lv2();
     });
 }
@@ -249,12 +249,12 @@ function renderC3_lv2() {
     });
     rankSortAry.splice(3, rankSortAry.length - 1);
     //移除第三筆資料後index3的資料 用otherTotal 代替跑c3圖表
-    rankSortAry.push("other", otherTotal);
+    rankSortAry.push(["other", otherTotal]);
   }
-
+  console.log(rankSortAry);
   //c3 chart
-  let chart = c3.generate({
-    bindto: "#chart", // HTML 元素綁定
+  c3.generate({
+    bindto: "#chart2", // HTML 元素綁定
     data: {
       type: "pie",
       columns: rankSortAry,

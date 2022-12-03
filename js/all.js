@@ -245,13 +245,7 @@ orderInfoBtn.addEventListener("click", (e) => {
   const customerEmail = document.querySelector("#customerEmail").value;
   const customerAddress = document.querySelector("#customerAddress").value;
   const tradeWay = document.querySelector("#tradeWay").value;
-  // console.log(
-  //   customerName,
-  //   customerPhone,
-  //   customerEmail,
-  //   customerAddress,
-  //   tradeWay
-  // );
+
   if (
     customerName == "" ||
     customerPhone == "" ||
@@ -262,6 +256,56 @@ orderInfoBtn.addEventListener("click", (e) => {
     alert("complete information");
     return;
   }
+  const constraints = {
+    name: {
+      presence: {
+        message: "是必填欄位",
+      },
+    },
+    tel: {
+      presence: {
+        message: "是必填欄位",
+      },
+    },
+    Email: {
+      presence: {
+        message: "是必填欄位",
+      },
+    },
+    address: {
+      presence: {
+        message: "是必填欄位",
+      },
+    },
+  };
+  const orderInfoForm = document.querySelector(".orderInfo-form");
+  const inputs = document.querySelectorAll(
+    "input[type=text],input[type=number],select,textarea"
+  );
+
+  inputs.forEach((item) => {
+    //console.log(item)
+    //console.log(item.nextElementSibling)
+    item.addEventListener("change", function () {
+      //預設為空值
+      item.nextElementSibling.textContent = "";
+
+      // 驗證回傳的內容
+      let errors = validate(orderInfoForm, constraints);
+      // console.log(errors)
+      //呈現在畫面上
+      if (errors) {
+        // console.log(Object.keys(errors)) //keys -> 屬性
+
+        Object.keys(errors).forEach(function (keys) {
+          // console.log(keys);
+          document.querySelector(`.${keys}`).textContent = errors[keys];
+          // errors.imgUrl -> Img url 是必填欄位
+        });
+      }
+    });
+  });
+
   axios
     .post(
       `https://livejs-api.hexschool.io/api/livejs/v1/customer/${api_path}/orders`,

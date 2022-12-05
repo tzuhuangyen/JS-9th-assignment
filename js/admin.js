@@ -85,7 +85,7 @@ orderList.addEventListener("click", (e) => {
   }
   if (targetClass == "js-orderStatus") {
     let status = e.target.getAttribute("data-status");
-
+    //使用 getAttribute 取出的值都會是字串，所以帶到函式 changeOrderStatus 的 status 型別就會是字串 "true" 或者 "false"。
     changeOrderStatus(status, id);
     return;
   }
@@ -94,7 +94,12 @@ orderList.addEventListener("click", (e) => {
 function changeOrderStatus(status, id) {
   //console.log(status, id);
   let newStatus;
-  if (status == true) {
+  if (status == "true") {
+    // 記得是比對字串
+    //如果將字串的 “true” 和布林值的 true 拿來比對，會出現錯誤
+    //"true" == true; // false
+    //"false" == true; // false
+    //所以會導致以下程式碼不論如何都只會跑 else 的選項，造成每次編輯訂單都會是「已處理」的結果
     newStatus = false;
   } else {
     newStatus = true;

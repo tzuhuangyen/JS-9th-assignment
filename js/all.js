@@ -108,9 +108,8 @@ const searchResultText = document.querySelector("#searchResult-text");
 //   productList.innerHTML = str;
 // })
 
-console.log("from here");
 let cartData = [];
-//５.購物車列表
+//５. get購物車列表
 const cartList = document.querySelector(".shoppingCart-tabList");
 function getCartList() {
   axios

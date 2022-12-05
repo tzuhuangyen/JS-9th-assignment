@@ -1,5 +1,4 @@
-console.log("hello");
-console.log(api_path, token);
+//console.log(api_path, token);
 
 const productList = document.querySelector(".productWrap");
 //console.log(productWrap);
@@ -228,83 +227,72 @@ discardAllBtn.addEventListener("click", (e) => {
     });
 });
 
-//8.送出訂單
+//8.送出訂單  表單驗證
+//DOM
 const orderInfoBtn = document.querySelector(".orderInfo-btn");
+const orderInfoForm = document.querySelector(".orderInfo-form");
+const inputs = document.querySelectorAll("input[name],select[name]");
+//驗證表單的規定
+const constraints = {
+  name: {
+    presence: {
+      message: "是必填欄位",
+    },
+  },
+  tel: {
+    presence: {
+      message: "是必填欄位",
+    },
+    length: {
+      minimum: 8,
+      message: "需至少 8 碼",
+    },
+  },
+  Email: {
+    presence: {
+      message: "是必填欄位",
+    },
+    email: {
+      message: "格式錯誤",
+    },
+  },
+  address: {
+    presence: {
+      message: "是必填欄位",
+    },
+  },
+  tradeWay: {
+    presence: {
+      message: "必填欄位",
+    },
+  },
+};
+//送表單至外部的DOM
+document.querySelector("#customerName").value = "";
+document.querySelector("#customerPhone").value = "";
+document.querySelector("#customerEmail").value = "";
+document.querySelector("#customerAddress").value = "";
+document.querySelector("#tradeWay").value = "ATM";
+
+//綁定送出表單按鈕監聽
 orderInfoBtn.addEventListener("click", (e) => {
   e.preventDefault();
-  //console.log("clicked");
   //確認購物車有無商品＆＆表單訊息完整才能送出訂單
   if (cartData.length === 0) {
     alert("購物車沒有商品 快去買起乃");
     return;
   }
-  //DOM訂單
-  const customerName = document.querySelector("#customerName").value;
-  const customerPhone = document.querySelector("#customerPhone").value;
-  const customerEmail = document.querySelector("#customerEmail").value;
-  const customerAddress = document.querySelector("#customerAddress").value;
-  const tradeWay = document.querySelector("#tradeWay").value;
-
-  if (
-    customerName == "" ||
-    customerPhone == "" ||
-    customerEmail == "" ||
-    customerAddress == "" ||
-    tradeWay == ""
-  ) {
-    alert("complete information");
-    return;
-  }
-  const constraints = {
-    name: {
-      presence: {
-        message: "是必填欄位",
-      },
-    },
-    tel: {
-      presence: {
-        message: "是必填欄位",
-      },
-    },
-    Email: {
-      presence: {
-        message: "是必填欄位",
-      },
-    },
-    address: {
-      presence: {
-        message: "是必填欄位",
-      },
-    },
-  };
-  const orderInfoForm = document.querySelector(".orderInfo-form");
-  const inputs = document.querySelectorAll(
-    "input[type=text],input[type=number],select,textarea"
-  );
-
-  inputs.forEach((item) => {
-    //console.log(item)
-    //console.log(item.nextElementSibling)
-    item.addEventListener("change", function () {
-      //預設為空值
-      item.nextElementSibling.textContent = "";
-
-      // 驗證回傳的內容
-      let errors = validate(orderInfoForm, constraints);
-      // console.log(errors)
-      //呈現在畫面上
-      if (errors) {
-        // console.log(Object.keys(errors)) //keys -> 屬性
-
-        Object.keys(errors).forEach(function (keys) {
-          // console.log(keys);
-          document.querySelector(`.${keys}`).textContent = errors[keys];
-          // errors.imgUrl -> Img url 是必填欄位
-        });
-      }
+  //確認表單填寫資料符合格式規範
+  let errors = validate(orderInfoForm, constraints) || "";
+  if (errors) {
+    Object.keys(errors).forEach(function (keys) {
+      // console.log(keys);
+      //console.log(document.querySelector(`[data-message=${keys}]`));
+      document.querySelector(`[data-message="${keys}"]`).textContent =
+        errors[keys];
+      // errors.imgUrl -> Img url 是必填欄位
     });
-  });
-
+  }
   axios
     .post(
       `https://livejs-api.hexschool.io/api/livejs/v1/customer/${api_path}/orders`,
@@ -320,16 +308,37 @@ orderInfoBtn.addEventListener("click", (e) => {
         },
       }
     )
-    .then((response) => {
-      alert("order has been sent!!");
-      document.querySelector("#customerName").value = "";
-      document.querySelector("#customerPhone").value = "";
-      document.querySelector("#customerEmail").value = "";
-      document.querySelector("#customerAddress").value = "";
-      document.querySelector("#tradeWay").value = "ATM";
+    .then((res) => {
+      alert("訂單送出成功");
+      const customerName = document.querySelector("#customerName");
+      const customerPhone = document.querySelector("#customerPhone");
+      const customerEmail = document.querySelector("#customerEmail");
+      const customerAddress = document.querySelector("#customerAddress");
+      const tradeWay = document.querySelector("#tradeWay");
       getCartList();
     });
 });
+
+// inputs.forEach((item) => {
+//   //console.log(item)
+//   //console.log(item.nextElementSibling)
+//   item.addEventListener("change", function () {
+//     //預設為空值
+//     item.nextElementSibling.textContent = "";
+//     // 驗證回傳的內容
+//     let errors = validate(orderInfoForm, constraints) || "";
+//     // console.log(errors)
+//     //呈現在畫面上
+//     if (errors) {
+//       // console.log(Object.keys(errors)) //keys -> 屬性
+//       Object.keys(errors).forEach(function (keys) {
+//         // console.log(document.querySelector(`[data-message=${keys}]`))
+//         document.querySelector(`[data-message="${keys}"]`).textContent =
+//           errors[keys];
+//       });
+//     }
+//   });
+// });
 
 // util js、元件
 function toThousands(x) {
